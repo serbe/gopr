@@ -93,3 +93,17 @@ func listAnonProxies(w http.ResponseWriter, r *http.Request) {
 	ctx := context{Title: "List anonimous proxies", Proxies: proxies}
 	render.DefaultResponder(w, r, ctx)
 }
+
+func getCounts(w http.ResponseWriter, r *http.Request) {
+	type context struct {
+		Title string `json:"title"`
+		All   int64  `json:"all"`
+		Work  int64  `json:"work"`
+		Anon  int64  `json:"anon"`
+	}
+	all := getAllCount()
+	work := getAllWorkCount()
+	anon := getAllAnonCount()
+	ctx := context{Title: "Proxies counts", All: all, Work: work, Anon: anon}
+	render.DefaultResponder(w, r, ctx)
+}

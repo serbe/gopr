@@ -85,3 +85,24 @@ func getAllAnonProxies() []Proxy {
 	errchkmsg("getAllAnonProxies", err)
 	return ps
 }
+
+func getAllCount() int64 {
+	var ps []Proxy
+	c, err := DB.Model(&ps).Count()
+	errchkmsg("getAllProxies", err)
+	return int64(c)
+}
+
+func getAllWorkCount() int64 {
+	var ps []Proxy
+	c, err := DB.Model(&ps).Where("work = TRUE").Count()
+	errchkmsg("getAllWorkProxies", err)
+	return int64(c)
+}
+
+func getAllAnonCount() int64 {
+	var ps []Proxy
+	c, err := DB.Model(&ps).Where("work = TRUE AND anon = TRUE").Count()
+	errchkmsg("getAllAnonProxies", err)
+	return int64(c)
+}

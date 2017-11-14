@@ -46,6 +46,7 @@ func initServer(host string, useLog bool) {
 			r.Get("/all", listProxies)
 			r.Get("/work", listWorkProxies)
 			r.Get("/anon", listAnonProxies)
+			r.Get("/counts", getCounts)
 		})
 
 		r.Route("/api/v1/proxy", func(r chi.Router) {
