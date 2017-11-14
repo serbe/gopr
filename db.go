@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/url"
 	"time"
 
 	"github.com/go-pg/pg"
@@ -12,18 +11,18 @@ var DB *pg.DB
 
 // Proxy - proxy unit
 type Proxy struct {
-	Insert   bool          `sql:"-"           json:"-"`
-	Update   bool          `sql:"-"           json:"-"`
-	Hostname string        `sql:"hostname,pk" json:"hostname"`
-	URL      *url.URL      `sql:"-"           json:"-"`
-	Host     string        `sql:"host"        json:"-"`
-	Port     string        `sql:"port"        json:"-"`
-	IsWork   bool          `sql:"work"        json:"-"`
-	IsAnon   bool          `sql:"anon"        json:"-"`
-	Checks   int           `sql:"checks"      json:"-"`
-	CreateAt time.Time     `sql:"create_at"   json:"-"`
-	UpdateAt time.Time     `sql:"update_at"   json:"-"`
-	Response time.Duration `sql:"response"    json:"-"`
+	// Insert   bool          `sql:"-"           json:"-"`
+	// Update   bool          `sql:"-"           json:"-"`
+	// URL      *url.URL      `sql:"-"           json:"-"`
+	Hostname string        `sql:"hostname,pk" json:""`
+	Host     string        `sql:"host"        json:"host"`
+	Port     string        `sql:"port"        json:"port"`
+	IsWork   bool          `sql:"work"        json:"work"`
+	IsAnon   bool          `sql:"anon"        json:"anon"`
+	Checks   int           `sql:"checks"      json:"check"`
+	CreateAt time.Time     `sql:"create_at"   json:"create"`
+	UpdateAt time.Time     `sql:"update_at"   json:"update"`
+	Response time.Duration `sql:"response"    json:"response"`
 }
 
 // // Link - link unit
