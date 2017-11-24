@@ -14,15 +14,17 @@ type Proxy struct {
 	// Insert   bool          `sql:"-"           json:"-"`
 	// Update   bool          `sql:"-"           json:"-"`
 	// URL      *url.URL      `sql:"-"           json:"-"`
-	Hostname string        `sql:"hostname,pk" json:""`
-	Host     string        `sql:"host"        json:"host"`
-	Port     string        `sql:"port"        json:"port"`
-	IsWork   bool          `sql:"work"        json:"work"`
-	IsAnon   bool          `sql:"anon"        json:"anon"`
-	Checks   int           `sql:"checks"      json:"check"`
-	CreateAt time.Time     `sql:"create_at"   json:"create"`
-	UpdateAt time.Time     `sql:"update_at"   json:"update"`
-	Response time.Duration `sql:"response"    json:"response"`
+	Hostname  string        `sql:"hostname,pk" json:""`
+	Host      string        `sql:"host"        json:"host"`
+	Port      string        `sql:"port"        json:"port"`
+	IsWork    bool          `sql:"work"        json:"work"`
+	IsAnon    bool          `sql:"anon"        json:"anon"`
+	Checks    int           `sql:"checks"      json:"check"`
+	CreateStr string        `sql:"-"           json:"create"`
+	UpdateSrt string        `sql:"-"           json:"update"`
+	CreateAt  time.Time     `sql:"create_at"   json:"-"`
+	UpdateAt  time.Time     `sql:"update_at"   json:"-"`
+	Response  time.Duration `sql:"response"    json:"response"`
 }
 
 // // Link - link unit
@@ -69,6 +71,10 @@ func getAllProxies() []Proxy {
 	var ps []Proxy
 	err := DB.Model(&ps).Select()
 	errchkmsg("getAllProxies", err)
+	for i, p := range ps {
+		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
+		ps[i].UpdateSrt = p.UpdateAt.Format("02.01.2006")
+	}
 	return ps
 }
 
@@ -76,6 +82,10 @@ func getAllWorkProxies() []Proxy {
 	var ps []Proxy
 	err := DB.Model(&ps).Where("work = TRUE").Select()
 	errchkmsg("getAllWorkProxies", err)
+	for i, p := range ps {
+		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
+		ps[i].UpdateSrt = p.UpdateAt.Format("02.01.2006")
+	}
 	return ps
 }
 
@@ -83,6 +93,10 @@ func getAllAnonProxies() []Proxy {
 	var ps []Proxy
 	err := DB.Model(&ps).Where("work = TRUE AND anon = TRUE").Select()
 	errchkmsg("getAllAnonProxies", err)
+	for i, p := range ps {
+		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
+		ps[i].UpdateSrt = p.UpdateAt.Format("02.01.2006")
+	}
 	return ps
 }
 
