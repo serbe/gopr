@@ -14,7 +14,8 @@ type Proxy struct {
 	// Insert   bool          `sql:"-"           json:"-"`
 	// Update   bool          `sql:"-"           json:"-"`
 	// URL      *url.URL      `sql:"-"           json:"-"`
-	Hostname  string        `sql:"hostname,pk" json:""`
+	ID        int64         `sql:"id,pk"       json:"id"`
+	Hostname  string        `sql:"hostname"    json:"-"`
 	Host      string        `sql:"host"        json:"host"`
 	Port      string        `sql:"port"        json:"port"`
 	IsWork    bool          `sql:"work"        json:"work"`
