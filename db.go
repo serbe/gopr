@@ -7,7 +7,7 @@ import (
 	"github.com/go-pg/pg"
 )
 
-var DB *pg.DB
+var dbase *pg.DB
 
 // Proxy - proxy unit
 type Proxy struct {
@@ -48,9 +48,9 @@ func initDB(host string, dbname string, user string, password string, logsql boo
 	if host != "" {
 		opt.Addr = host
 	}
-	DB = pg.Connect(&opt)
+	dbase = pg.Connect(&opt)
 	if logsql {
-		DB.OnQueryProcessed(func(event *pg.QueryProcessedEvent) {
+		dbase.OnQueryProcessed(func(event *pg.QueryProcessedEvent) {
 			query, err := event.FormattedQuery()
 			if err != nil {
 				panic(err)
@@ -63,14 +63,14 @@ func initDB(host string, dbname string, user string, password string, logsql boo
 
 func getProxyByID(id int64) Proxy {
 	var p Proxy
-	err := DB.Model(&p).Where("id = ?", id).Select()
+	err := dbase.Model(&p).Where("id = ?", id).Select()
 	errchkmsg("getProxy", err)
 	return p
 }
 
 func getAllProxies() []Proxy {
 	var ps []Proxy
-	err := DB.Model(&ps).Select()
+	err := dbase.Model(&ps).Select()
 	errchkmsg("getAllProxies", err)
 	for i, p := range ps {
 		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
@@ -81,7 +81,7 @@ func getAllProxies() []Proxy {
 
 func getAllWorkProxies() []Proxy {
 	var ps []Proxy
-	err := DB.Model(&ps).Where("work = TRUE").Select()
+	err := dbase.Model(&ps).Where("work = TRUE").Select()
 	errchkmsg("getAllWorkProxies", err)
 	for i, p := range ps {
 		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
@@ -92,7 +92,7 @@ func getAllWorkProxies() []Proxy {
 
 func getAllAnonProxies() []Proxy {
 	var ps []Proxy
-	err := DB.Model(&ps).Where("work = TRUE AND anon = TRUE").Select()
+	err := dbase.Model(&ps).Where("work = TRUE AND anon = TRUE").Select()
 	errchkmsg("getAllAnonProxies", err)
 	for i, p := range ps {
 		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
@@ -103,21 +103,21 @@ func getAllAnonProxies() []Proxy {
 
 func getAllCount() int64 {
 	var ps []Proxy
-	c, err := DB.Model(&ps).Count()
+	c, err := dbase.Model(&ps).Count()
 	errchkmsg("getAllProxies", err)
 	return int64(c)
 }
 
 func getAllWorkCount() int64 {
 	var ps []Proxy
-	c, err := DB.Model(&ps).Where("work = TRUE").Count()
+	c, err := dbase.Model(&ps).Where("work = TRUE").Count()
 	errchkmsg("getAllWorkProxies", err)
 	return int64(c)
 }
 
 func getAllAnonCount() int64 {
 	var ps []Proxy
-	c, err := DB.Model(&ps).Where("work = TRUE AND anon = TRUE").Count()
+	c, err := dbase.Model(&ps).Where("work = TRUE AND anon = TRUE").Count()
 	errchkmsg("getAllAnonProxies", err)
 	return int64(c)
 }
