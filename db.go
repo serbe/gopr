@@ -39,7 +39,12 @@ type Proxy struct {
 // }
 
 // initDB initialize database
-func initDB(host string, dbname string, user string, password string, logsql bool) {
+func initDB(host string,
+	dbname string,
+	user string,
+	password string,
+	logsql bool,
+) {
 	opt := pg.Options{
 		User:     user,
 		Password: password,

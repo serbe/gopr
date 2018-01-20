@@ -11,7 +11,7 @@ import (
 
 var sKey = []byte("aH0tH3P5up3RdYP3r53crEt")
 
-var tokenAuth *jwtauth.JwtAuth
+var tokenAuth *jwtauth.JWTAuth
 
 type loginData struct {
 	Username string `json:"username"`
@@ -42,7 +42,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if data.Username == "user" && data.Password == "userpass" {
-		_, tokenString, err := tokenAuth.Encode(jwtauth.Claims{
+		var tokenString string
+		_, tokenString, err = tokenAuth.Encode(jwtauth.Claims{
 			"admin": false,
 			"name":  data.Username,
 			"exp":   time.Now().Add(time.Hour * 24).Unix(),
@@ -55,7 +56,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 			errchkmsg("login Body.Close", err)
 			return
 		}
-		render.JSON(w, r, jToken{Token: tokenString, Name: data.Username, Admin: false})
+		render.JSON(w, r, jToken{
+			Token: tokenString,
+			Name:  data.Username,
+			Admin: false,
+		})
 	} else {
 		render.Status(r, http.StatusNotFound)
 		render.PlainText(w, r, "Invalid Username or Password")

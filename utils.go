@@ -14,19 +14,19 @@ var (
 
 // Config all vars
 type Config struct {
+	Web struct {
+		Log  bool   `json:"log"`
+		Host string `json:"host"`
+		Port string `json:"port"`
+	} `json:"web"`
 	Base struct {
+		LogSQL   bool   `json:"logsql"`
+		LogErr   bool   `json:"logerr"`
 		Host     string `json:"host"`
 		User     string `json:"user"`
 		Password string `json:"password"`
 		Dbname   string `json:"dbname"`
-		LogSQL   bool   `json:"logsql"`
-		LogErr   bool   `json:"logerr"`
 	} `json:"base"`
-	Web struct {
-		Host string `json:"host"`
-		Port string `json:"port"`
-		Log  bool   `json:"log"`
-	} `json:"web"`
 }
 
 func getConfig() (c Config, err error) {
