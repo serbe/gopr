@@ -73,36 +73,41 @@ func getProxyByID(id int64) Proxy {
 	return p
 }
 
-func getAllProxies() []Proxy {
-	var ps []Proxy
-	err := dbase.Model(&ps).Select()
-	errchkmsg("getAllProxies", err)
+func getProxies(p string) ([]Proxy, error) {
+	var (
+		ps  []Proxy
+		err error
+	)
+	if p == "" {
+		err = dbase.Model(&ps).Select()
+	} else {
+		err = dbase.Model(&ps).Where(p).Select()
+	}
+	if err != nil {
+		return ps, err
+	}
 	for i, p := range ps {
 		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
 		ps[i].UpdateSrt = p.UpdateAt.Format("02.01.2006")
 	}
+	return ps, nil
+}
+
+func getAllProxies() []Proxy {
+	ps, err := getProxies("")
+	errchkmsg("getAllProxies", err)
 	return ps
 }
 
 func getAllWorkProxies() []Proxy {
-	var ps []Proxy
-	err := dbase.Model(&ps).Where("work = TRUE").Select()
+	ps, err := getProxies("work = TRUE")
 	errchkmsg("getAllWorkProxies", err)
-	for i, p := range ps {
-		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
-		ps[i].UpdateSrt = p.UpdateAt.Format("02.01.2006")
-	}
 	return ps
 }
 
 func getAllAnonProxies() []Proxy {
-	var ps []Proxy
-	err := dbase.Model(&ps).Where("work = TRUE AND anon = TRUE").Select()
+	ps, err := getProxies("work = TRUE AND anon = TRUE")
 	errchkmsg("getAllAnonProxies", err)
-	for i, p := range ps {
-		ps[i].CreateStr = p.CreateAt.Format("02.01.2006")
-		ps[i].UpdateSrt = p.UpdateAt.Format("02.01.2006")
-	}
 	return ps
 }
 

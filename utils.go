@@ -15,6 +15,7 @@ var (
 // Config all vars
 type Config struct {
 	Web struct {
+		Auth bool   `json:"auth"`
 		Log  bool   `json:"log"`
 		Host string `json:"host"`
 		Port string `json:"port"`

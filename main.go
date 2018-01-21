@@ -12,5 +12,5 @@ func main() {
 		cfg.Base.Password,
 		cfg.Base.LogSQL,
 	)
-	initServer(cfg.Web.Host+":"+cfg.Web.Port, cfg.Web.Log)
+	initServer(cfg.Web.Host+":"+cfg.Web.Port, cfg.Web.Log, cfg.Web.Auth)
 }
