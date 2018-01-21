@@ -39,7 +39,7 @@ type Proxy struct {
 // }
 
 // initDB initialize database
-func initDB(host string,
+func initDB(
 	dbname string,
 	user string,
 	password string,
@@ -49,9 +49,6 @@ func initDB(host string,
 		User:     user,
 		Password: password,
 		Database: dbname,
-	}
-	if host != "" {
-		opt.Addr = host
 	}
 	dbase = pg.Connect(&opt)
 	if logsql {
@@ -63,6 +60,10 @@ func initDB(host string,
 
 			log.Printf("%s %s", time.Since(event.StartTime), query)
 		})
+	}
+	_, err := dbase.Exec("SELECT")
+	if err != nil {
+		panic(err)
 	}
 }
 

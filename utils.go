@@ -23,7 +23,6 @@ type Config struct {
 	Base struct {
 		LogSQL   bool   `json:"logsql"`
 		LogErr   bool   `json:"logerr"`
-		Host     string `json:"host"`
 		User     string `json:"user"`
 		Password string `json:"password"`
 		Dbname   string `json:"dbname"`
