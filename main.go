@@ -1,15 +1,19 @@
 package main
 
+import (
+	"github.com/serbe/adb"
+)
+
 func main() {
 	cfg, err := getConfig()
 	if err != nil {
 		return
 	}
-	initDB(
+	DB = adb.InitDB(
 		cfg.Base.Dbname,
+		"127.0.0.1",
 		cfg.Base.User,
 		cfg.Base.Password,
-		cfg.Base.LogSQL,
 	)
-	initServer(cfg.Web.Host+":"+cfg.Web.Port, cfg.Web.Log, cfg.Web.Auth)
+	initServer(":"+cfg.Web.Port, cfg.Web.Log, cfg.Web.Auth)
 }

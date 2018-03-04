@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"github.com/serbe/adb"
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,40 +60,40 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 
 func getProxy(w http.ResponseWriter, r *http.Request) {
 	type context struct {
-		Title string `json:"title"`
-		Proxy Proxy  `json:"proxy"`
+		Title string    `json:"title"`
+		Proxy adb.Proxy `json:"proxy"`
 	}
 	id := toInt(chi.URLParam(r, "id"))
-	proxy := getProxyByID(id)
+	proxy, _ := DB.ProxyGetByID(id)
 	ctx := context{Title: "Proxy", Proxy: proxy}
 	render.DefaultResponder(w, r, ctx)
 }
 
 func listProxies(w http.ResponseWriter, r *http.Request) {
 	type context struct {
-		Title   string  `json:"title"`
-		Proxies []Proxy `json:"proxies"`
+		Title   string      `json:"title"`
+		Proxies []adb.Proxy `json:"proxies"`
 	}
-	proxies := getAllProxies()
+	proxies, _ := DB.ProxyGetAll()
 	ctx := context{Title: "List all proxies", Proxies: proxies}
 	render.DefaultResponder(w, r, ctx)
 }
 
 func listWorkProxies(w http.ResponseWriter, r *http.Request) {
 	type context struct {
-		Title   string  `json:"title"`
-		Proxies []Proxy `json:"proxies"`
+		Title   string      `json:"title"`
+		Proxies []adb.Proxy `json:"proxies"`
 	}
-	proxies := getAllWorkProxies()
+	proxies, _ := DB.ProxyGetAllWorking()
 	ctx := context{Title: "List working proxies", Proxies: proxies}
 	render.DefaultResponder(w, r, ctx)
 }
 func listAnonProxies(w http.ResponseWriter, r *http.Request) {
 	type context struct {
-		Title   string  `json:"title"`
-		Proxies []Proxy `json:"proxies"`
+		Title   string      `json:"title"`
+		Proxies []adb.Proxy `json:"proxies"`
 	}
-	proxies := getAllAnonProxies()
+	proxies, _ := DB.ProxyGetAllAnonymous()
 	ctx := context{Title: "List anonimous proxies", Proxies: proxies}
 	render.DefaultResponder(w, r, ctx)
 }
@@ -104,9 +105,9 @@ func getCounts(w http.ResponseWriter, r *http.Request) {
 		Work  int64  `json:"work"`
 		Anon  int64  `json:"anon"`
 	}
-	all := getAllCount()
-	work := getAllWorkCount()
-	anon := getAllAnonCount()
+	all := DB.ProxyGetAllCount()
+	work := DB.ProxyGetAllWorkCount()
+	anon := DB.ProxyGetAllAnonymousCount()
 	ctx := context{Title: "Proxies counts", All: all, Work: work, Anon: anon}
 	render.DefaultResponder(w, r, ctx)
 }
