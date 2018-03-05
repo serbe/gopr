@@ -37,7 +37,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		render.Status(r, http.StatusInternalServerError)
 		render.PlainText(w, r, err.Error())
 		err = r.Body.Close()
-		errchkmsg("login Body.Close", err)
+		errChkMsg("login Body.Close", err)
 		return
 	}
 
@@ -53,7 +53,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 			render.Status(r, http.StatusInternalServerError)
 			render.PlainText(w, r, err.Error())
 			err = r.Body.Close()
-			errchkmsg("login Body.Close", err)
+			errChkMsg("login Body.Close", err)
 			return
 		}
 		render.JSON(w, r, jToken{
@@ -66,5 +66,5 @@ func login(w http.ResponseWriter, r *http.Request) {
 		render.PlainText(w, r, "Invalid Username or Password")
 	}
 	err = r.Body.Close()
-	errchkmsg("login Body.Close", err)
+	errChkMsg("login Body.Close", err)
 }

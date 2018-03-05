@@ -9,7 +9,7 @@ func main() {
 	if err != nil {
 		return
 	}
-	DB = adb.InitDB(
+	db = adb.InitDB(
 		cfg.Base.Dbname,
 		"127.0.0.1",
 		cfg.Base.User,

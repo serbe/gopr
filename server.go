@@ -23,12 +23,6 @@ func initServer(host string, useLog bool, useAuth bool) {
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(corsHandler)
 
-	// // Frontend
-	// r.Get("/", indexHandler)
-	// r.Get("/favicon.ico", serveFileHandler)
-	// FileServer(r, "/static", http.Dir(filepath.Join("public", "static")))
-	// r.NotFound(indexHandler)
-
 	// Check
 	r.Get("/check", checkHandler)
 
@@ -59,5 +53,5 @@ func initServer(host string, useLog bool, useAuth bool) {
 	})
 
 	err := http.ListenAndServe(host, r)
-	errchkmsg("ListenAndServe", err)
+	errChkMsg("ListenAndServe", err)
 }
