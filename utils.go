@@ -27,7 +27,8 @@ type Config struct {
 		LogErr   bool   `json:"logerr"`
 		User     string `json:"user"`
 		Password string `json:"password"`
-		Dbname   string `json:"dbname"`
+		Name     string `json:"name"`
+		Host     string `json:"host"`
 	} `json:"base"`
 }
 
@@ -43,7 +44,7 @@ func getConfig() (Config, error) {
 		return c, err
 	}
 	logErrors = c.Base.LogErr
-	if c.Base.Dbname == "" {
+	if c.Base.Name == "" {
 		err = errors.New("Error: empty database name in config")
 		errmsg("getConfig", err)
 		return c, err

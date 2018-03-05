@@ -10,8 +10,8 @@ func main() {
 		return
 	}
 	db = adb.InitDB(
-		cfg.Base.Dbname,
-		"127.0.0.1",
+		cfg.Base.Name,
+		cfg.Base.Host,
 		cfg.Base.User,
 		cfg.Base.Password,
 	)

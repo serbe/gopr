@@ -2,7 +2,8 @@
 	"base": {
 		"user": "Pquser",
 		"password": "Pqpassword",
-		"dbname": "Pqdbname",
+		"name": "Pqdbname",
+		"host": "127.0.0.1:5432",
 		"logsql": false,
 		"logerr": false
 	},
