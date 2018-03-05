@@ -1,24 +1,40 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
-	"path"
-	"path/filepath"
-	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/serbe/adb"
 )
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, filepath.Join("public", "index.html"))
+var headers = []string{
+	"HTTP_VIA",
+	"HTTP_X_FORWARDED_FOR",
+	"HTTP_FORWARDED_FOR",
+	"HTTP_X_FORWARDED",
+	"HTTP_FORWARDED",
+	"HTTP_CLIENT_IP",
+	"HTTP_FORWARDED_FOR_IP",
+	"VIA",
+	"X_FORWARDED_FOR",
+	"FORWARDED_FOR",
+	"X_FORWARDED",
+	"FORWARDED",
+	"CLIENT_IP",
+	"FORWARDED_FOR_IP",
+	"HTTP_PROXY_CONNECTION",
 }
 
-func serveFileHandler(w http.ResponseWriter, r *http.Request) {
-	fname := path.Base(r.URL.Path)
-	http.ServeFile(w, r, filepath.Join("public", fname))
-}
+// func indexHandler(w http.ResponseWriter, r *http.Request) {
+// 	http.ServeFile(w, r, filepath.Join("public", "index.html"))
+// }
+
+// func serveFileHandler(w http.ResponseWriter, r *http.Request) {
+// 	fname := path.Base(r.URL.Path)
+// 	http.ServeFile(w, r, filepath.Join("public", fname))
+// }
 
 func corsHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -40,22 +56,35 @@ func corsHandler(h http.Handler) http.Handler {
 
 // FileServer conveniently sets up a http.FileServer handler to serve
 // static files from a http.FileSystem.
-func FileServer(r chi.Router, path string, root http.FileSystem) {
-	if strings.ContainsAny(path, ":*") {
-		panic("FileServer does not permit URL parameters.")
+// func FileServer(r chi.Router, path string, root http.FileSystem) {
+// 	if strings.ContainsAny(path, ":*") {
+// 		panic("FileServer does not permit URL parameters.")
+// 	}
+
+// 	fs := http.StripPrefix(path, http.FileServer(root))
+
+// 	if path != "/" && path[len(path)-1] != '/' {
+// 		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+// 		path += "/"
+// 	}
+// 	path += "*"
+
+// 	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		fs.ServeHTTP(w, r)
+// 	}))
+// }
+
+func checkHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := fmt.Fprintf(w, "<p>RemoteAddr: %s</p>", r.RemoteAddr)
+	errchkmsg("checkHandler fmt.Fprintf", err)
+	for _, header := range headers {
+		str := r.Header.Get(header)
+		if str == "" {
+			continue
+		}
+		_, err = fmt.Fprintf(w, "<p>%s: %s</p>", header, str)
+		errchkmsg("checkHandler fmt.Fprintf", err)
 	}
-
-	fs := http.StripPrefix(path, http.FileServer(root))
-
-	if path != "/" && path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
-		path += "/"
-	}
-	path += "*"
-
-	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fs.ServeHTTP(w, r)
-	}))
 }
 
 func getProxy(w http.ResponseWriter, r *http.Request) {

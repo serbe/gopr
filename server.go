@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -24,11 +23,14 @@ func initServer(host string, useLog bool, useAuth bool) {
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(corsHandler)
 
-	// Frontend
-	r.Get("/", indexHandler)
-	r.Get("/favicon.ico", serveFileHandler)
-	FileServer(r, "/static", http.Dir(filepath.Join("public", "static")))
-	r.NotFound(indexHandler)
+	// // Frontend
+	// r.Get("/", indexHandler)
+	// r.Get("/favicon.ico", serveFileHandler)
+	// FileServer(r, "/static", http.Dir(filepath.Join("public", "static")))
+	// r.NotFound(indexHandler)
+
+	// Check
+	r.Get("/check", checkHandler)
 
 	// Auth
 	r.Group(func(r chi.Router) {
@@ -57,5 +59,5 @@ func initServer(host string, useLog bool, useAuth bool) {
 	})
 
 	err := http.ListenAndServe(host, r)
-	errmsg("ListenAndServe", err)
+	errchkmsg("ListenAndServe", err)
 }

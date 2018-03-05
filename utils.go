@@ -23,7 +23,7 @@ type Config struct {
 		Port string `json:"port"`
 	} `json:"web"`
 	Base struct {
-		LogSQL   bool   `json:"logsql"`
+		// LogSQL   bool   `json:"logsql"`
 		LogErr   bool   `json:"logerr"`
 		User     string `json:"user"`
 		Password string `json:"password"`
