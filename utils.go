@@ -30,6 +30,10 @@ type Config struct {
 		Name     string `json:"name"`
 		Host     string `json:"host"`
 	} `json:"base"`
+	Bot struct {
+		Enable bool   `json:"enable"`
+		Token  string `json:"token"`
+	} `json:"bot"`
 }
 
 func getConfig() (Config, error) {

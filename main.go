@@ -17,5 +17,8 @@ func main() {
 		cfg.Base.User,
 		cfg.Base.Password,
 	)
+	if cfg.Bot.Enable {
+		go startBot(cfg.Bot.Token)
+	}
 	initServer(":"+cfg.Web.Port, cfg.Web.Log, cfg.Web.Auth)
 }

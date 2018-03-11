@@ -11,5 +11,9 @@
 		"port": "8080",
 		"log": true,
 		"auth": true
+	},
+	"bot": {
+		"enable": true,
+		"token": "bottoken"
 	}
 }
