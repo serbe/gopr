@@ -1,16 +1,9 @@
 package main
 
-import (
-	"log"
-
-	"github.com/serbe/adb"
-)
+import "github.com/serbe/adb"
 
 func main() {
-	cfg, err := getConfig()
-	if err != nil {
-		log.Panic(err)
-	}
+	getConfig()
 	db = adb.InitDB(
 		cfg.Base.Name,
 		cfg.Base.Host,
@@ -18,7 +11,7 @@ func main() {
 		cfg.Base.Password,
 	)
 	if cfg.Bot.Enable {
-		go startBot(cfg.Bot.Token)
+		go startBot()
 	}
-	initServer(":"+cfg.Web.Port, cfg.Web.Log, cfg.Web.Auth)
+	initServer()
 }

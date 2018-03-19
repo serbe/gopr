@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/serbe/adb"
 )
@@ -13,14 +14,17 @@ import (
 var (
 	logErrors bool
 	db        *adb.ADB
+	cfg       Config
 )
 
 // Config all vars
 type Config struct {
 	Web struct {
-		Auth bool   `json:"auth"`
-		Log  bool   `json:"log"`
-		Port string `json:"port"`
+		Auth     bool   `json:"auth"`
+		Log      bool   `json:"log"`
+		CORS     bool   `json:"cors"`
+		CORS_URL string `json:"cors_url"`
+		Port     string `json:"port"`
 	} `json:"web"`
 	Base struct {
 		// LogSQL   bool   `json:"logsql"`
@@ -36,24 +40,19 @@ type Config struct {
 	} `json:"bot"`
 }
 
-func getConfig() (Config, error) {
-	var c Config
+func getConfig() {
 	file, err := ioutil.ReadFile("./config.json")
 	if err != nil {
-		errmsg("getConfig ReadFile", err)
-		return c, err
+		log.Fatal("getConfig ReadFile", err)
 	}
-	if err = json.Unmarshal(file, &c); err != nil {
-		errmsg("getConfig Unmarshal", err)
-		return c, err
+	if err = json.Unmarshal(file, &cfg); err != nil {
+		log.Fatal("getConfig Unmarshal", err)
 	}
-	logErrors = c.Base.LogErr
-	if c.Base.Name == "" {
+	logErrors = cfg.Base.LogErr
+	if cfg.Base.Name == "" {
 		err = errors.New("Error: empty database name in config")
-		errmsg("getConfig", err)
-		return c, err
+		log.Fatal("getConfig", err)
 	}
-	return c, err
 }
 
 func toInt(num string) int64 {
@@ -72,4 +71,31 @@ func errChkMsg(str string, err error) {
 	if logErrors && err != nil {
 		log.Println("Error in", str, err)
 	}
+}
+
+func getArgInt(str string) int {
+	var result int
+	text := strings.Trim(str, " ")
+	text = strings.Replace(text, "  ", " ", -1)
+	split := strings.Split(text, " ")
+	if len(split) == 2 {
+		result, _ = strconv.Atoi(split[1])
+	}
+	if result > 100 {
+		result = 100
+	} else if result < 1 {
+		result = 1
+	}
+	return result
+}
+
+func getArgString(str string) string {
+	var result string
+	text := strings.Trim(str, " ")
+	text = strings.Replace(text, "  ", " ", -1)
+	split := strings.Split(text, " ")
+	if len(split) == 2 {
+		result = split[1]
+	}
+	return result
 }

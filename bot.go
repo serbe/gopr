@@ -2,40 +2,24 @@ package main
 
 import (
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-func startBot(token string) {
+func startBot() {
 	b, err := tb.NewBot(tb.Settings{
-		Token:  token,
+		Token:  cfg.Bot.Token,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 	})
 
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	b.Handle("/work", func(m *tb.Message) {
-		var (
-			arg int
-		)
-		text := strings.Trim(m.Text, " ")
-		text = strings.Replace(text, "  ", " ", -1)
-		split := strings.Split(text, " ")
-		if len(split) == 2 {
-			arg, _ = strconv.Atoi(split[1])
-		}
-		if arg > 100 {
-			arg = 100
-		} else if arg < 1 {
-			arg = 1
-		}
-		list, err := db.ProxyGetRandomWorking(arg)
+		list, err := db.ProxyGetRandomWorking(getArgInt(m.Text))
 		if err != nil {
 			b.Send(m.Sender, err.Error())
 			return
@@ -44,26 +28,28 @@ func startBot(token string) {
 	})
 
 	b.Handle("/anon", func(m *tb.Message) {
-		var (
-			arg int
-		)
-		text := strings.Trim(m.Text, " ")
-		text = strings.Replace(text, "  ", " ", -1)
-		split := strings.Split(text, " ")
-		if len(split) == 2 {
-			arg, _ = strconv.Atoi(split[1])
-		}
-		if arg > 100 {
-			arg = 100
-		} else if arg < 1 {
-			arg = 1
-		}
-		list, err := db.ProxyGetRandomAnonymous(arg)
+		list, err := db.ProxyGetRandomWorking(getArgInt(m.Text))
 		if err != nil {
 			b.Send(m.Sender, err.Error())
 			return
 		}
 		b.Send(m.Sender, strings.Join(list, "\n"))
+	})
+
+	b.Handle("/count", func(m *tb.Message) {
+		arg := getArgString(m.Text)
+		var result string
+		switch arg {
+		case "":
+			result = string(db.ProxyGetAllCount())
+		case "work":
+			result = string(db.ProxyGetAllWorkCount())
+		case "anon":
+			result = string(db.ProxyGetAllAnonymousCount())
+		default:
+			result = "Use work anon or empty string"
+		}
+		b.Send(m.Sender, result)
 	})
 
 	b.Start()

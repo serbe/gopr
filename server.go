@@ -10,18 +10,20 @@ import (
 	"github.com/go-chi/render"
 )
 
-func initServer(host string, useLog bool, useAuth bool) {
+func initServer() {
 	tokenAuth = jwtauth.New("HS256", sKey, nil)
 
 	r := chi.NewRouter()
 
-	if useLog {
+	if cfg.Web.Log {
 		r.Use(middleware.Logger)
 	}
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Use(corsHandler)
+	if cfg.Web.CORS {
+		r.Use(corsHandler)
+	}
 
 	// Check
 	r.Get("/check", checkHandler)
@@ -33,25 +35,22 @@ func initServer(host string, useLog bool, useAuth bool) {
 
 	// REST API
 	r.Group(func(r chi.Router) {
-		if useAuth {
+		if cfg.Web.Auth {
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator)
 		}
 
 		r.Use(render.SetContentType(render.ContentTypeJSON))
 
-		r.Route("/api/v1/proxies", func(r chi.Router) {
+		r.Route("/api/proxies", func(r chi.Router) {
+			r.Get("/{id}", getProxy)
 			r.Get("/all", listProxies)
 			r.Get("/work", listWorkProxies)
 			r.Get("/anon", listAnonProxies)
 			r.Get("/counts", getCounts)
 		})
-
-		r.Route("/api/v1/proxy", func(r chi.Router) {
-			r.Get("/{id}", getProxy)
-		})
 	})
 
-	err := http.ListenAndServe(host, r)
+	err := http.ListenAndServe(":"+cfg.Web.Port, r)
 	errChkMsg("ListenAndServe", err)
 }
