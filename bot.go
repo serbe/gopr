@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -38,16 +39,17 @@ func startBot() {
 
 	b.Handle("/count", func(m *tb.Message) {
 		arg := getArgString(m.Text)
+		log.Println(arg, m.Text)
 		var result string
 		switch arg {
 		case "":
-			result = string(db.ProxyGetAllCount())
+			result = strconv.FormatInt(db.ProxyGetAllCount(), 10)
 		case "work":
-			result = string(db.ProxyGetAllWorkCount())
+			result = strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
 		case "anon":
-			result = string(db.ProxyGetAllAnonymousCount())
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
 		default:
-			result = "Use work anon or empty string"
+			result = "Use work, anon or empty string"
 		}
 		b.Send(m.Sender, result)
 	})
