@@ -8,9 +8,17 @@ func initServer() {
 	m := func(ctx *fasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 		case "/check":
-			checkHandler(ctx)
-		// case "/bar":
-		// 	barHandlerFunc(ctx)
+			if ctx.IsGet() {
+				checkHandler(ctx)
+			} else {
+				ctx.Error("not found", fasthttp.StatusNotFound)
+			}
+		case "/login":
+			if ctx.IsPost() {
+				login(ctx)
+			} else {
+				ctx.Error("not found", fasthttp.StatusNotFound)
+			}
 		// case "/baz":
 		// 	bazHandler.HandlerFunc(ctx)
 		default:

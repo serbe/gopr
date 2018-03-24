@@ -12,9 +12,11 @@ import (
 )
 
 var (
-	logErrors bool
-	db        *adb.ADB
-	cfg       Config
+	logErrors          bool
+	db                 *adb.ADB
+	cfg                Config
+	strContentType     = []byte("Content-Type")
+	strApplicationJSON = []byte("application/json")
 )
 
 // Config all vars
