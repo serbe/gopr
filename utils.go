@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -22,8 +23,8 @@ var (
 // Config all vars
 type Config struct {
 	Web struct {
-		Auth     bool   `json:"auth"`
-		Log      bool   `json:"log"`
+		Auth bool `json:"auth"`
+		// Log      bool   `json:"log"`
 		CORS     bool   `json:"cors"`
 		CORS_URL string `json:"cors_url"`
 		Port     string `json:"port"`
@@ -57,11 +58,11 @@ func getConfig() {
 	}
 }
 
-func toInt(num string) int64 {
-	id, err := strconv.ParseInt(num, 10, 64)
-	errChkMsg("toInt", err)
-	return id
-}
+// func toInt(num string) int64 {
+// 	id, err := strconv.ParseInt(num, 10, 64)
+// 	errChkMsg("toInt", err)
+// 	return id
+// }
 
 func errmsg(str string, err error) {
 	if logErrors {
@@ -100,4 +101,13 @@ func getArgString(str string) string {
 		result = split[1]
 	}
 	return result
+}
+
+func parseBearerAuth(auth string) string {
+	if strings.HasPrefix(auth, "Bearer ") {
+		if bearer, err := base64.StdEncoding.DecodeString(auth[7:]); err == nil {
+			return string(bearer)
+		}
+	}
+	return ""
 }

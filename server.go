@@ -10,14 +10,6 @@ func initServer() {
 			switch string(ctx.Path()) {
 			case "/login":
 				login(ctx)
-			// case "/api/proxies/all":
-			// 	listProxies(ctx)
-			// case "/api/proxies/work":
-			// 	listWorkProxies(ctx)
-			// case "/api/proxies/anon":
-			// 	listAnonProxies(ctx)
-			// case "/api/proxies/counts":
-			// 	getCounts(ctx)
 			default:
 				ctx.Error("not found", fasthttp.StatusNotFound)
 			}
@@ -25,6 +17,30 @@ func initServer() {
 			switch string(ctx.Path()) {
 			case "/check":
 				checkHandler(ctx)
+			case "/api/proxies/all":
+				if checkAuth(ctx) {
+					listProxies(ctx)
+				} else {
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+				}
+			case "/api/proxies/work":
+				if checkAuth(ctx) {
+					listWorkProxies(ctx)
+				} else {
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+				}
+			case "/api/proxies/anon":
+				if checkAuth(ctx) {
+					listAnonProxies(ctx)
+				} else {
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+				}
+			case "/api/proxies/counts":
+				if checkAuth(ctx) {
+					getCounts(ctx)
+				} else {
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+				}
 			default:
 				ctx.Error("not found", fasthttp.StatusNotFound)
 			}

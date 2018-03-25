@@ -59,3 +59,21 @@ func login(ctx *fasthttp.RequestCtx) {
 		ctx.Error("Invalid Username or Password", fasthttp.StatusNotFound)
 	}
 }
+
+func checkAuth(ctx *fasthttp.RequestCtx) bool {
+	if cfg.Web.Auth {
+		parser := &jwt.Parser{
+			ValidMethods: []string{"HS256"},
+		}
+		bearer := parseBearerAuth(string(ctx.Request.Header.Peek("Authorization")))
+		if bearer == "" {
+			return false
+		}
+		token, err := parser.Parse(bearer, func(t *jwt.Token) (interface{}, error) {
+			return sKey, nil
+		})
+		errChkMsg("checkAuth Parse", err)
+		return token.Valid
+	}
+	return true
+}

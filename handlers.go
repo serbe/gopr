@@ -44,6 +44,7 @@ func listProxies(ctx *fasthttp.RequestCtx) {
 		Title   string      `json:"title"`
 		Proxies []adb.Proxy `json:"proxies"`
 	}
+	cors(ctx)
 	proxies, _ := db.ProxyGetAll()
 	err := json.NewEncoder(ctx).Encode(context{Title: "List all proxies", Proxies: proxies})
 	errChkMsg("listProxies Encode", err)
@@ -54,6 +55,7 @@ func listWorkProxies(ctx *fasthttp.RequestCtx) {
 		Title   string      `json:"title"`
 		Proxies []adb.Proxy `json:"proxies"`
 	}
+	cors(ctx)
 	proxies, _ := db.ProxyGetAllWorking()
 	err := json.NewEncoder(ctx).Encode(context{Title: "List working proxies", Proxies: proxies})
 	errChkMsg("listWorkProxies Encode", err)
@@ -64,6 +66,7 @@ func listAnonProxies(ctx *fasthttp.RequestCtx) {
 		Title   string      `json:"title"`
 		Proxies []adb.Proxy `json:"proxies"`
 	}
+	cors(ctx)
 	proxies, _ := db.ProxyGetAllAnonymous()
 	err := json.NewEncoder(ctx).Encode(context{Title: "List anonymous proxies", Proxies: proxies})
 	errChkMsg("listWorkProxies Encode", err)
@@ -76,6 +79,7 @@ func getCounts(ctx *fasthttp.RequestCtx) {
 		Work  int64  `json:"work"`
 		Anon  int64  `json:"anon"`
 	}
+	cors(ctx)
 	all := db.ProxyGetAllCount()
 	work := db.ProxyGetAllWorkCount()
 	anon := db.ProxyGetAllAnonymousCount()
@@ -83,23 +87,19 @@ func getCounts(ctx *fasthttp.RequestCtx) {
 	errChkMsg("getCounts Encode", err)
 }
 
-// func corsHandler(h http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		w.Header().Set("Access-Control-Allow-Origin", cfg.Web.CORS_URL)
-// 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
-// 		w.Header().Set("Access-Control-Max-Age", "3600")
-// 		w.Header().Set(
-// 			"Access-Control-Allow-Headers",
-// 			"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-// 		)
-// 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-
-// 		if r.Method == "OPTIONS" {
-// 			return
-// 		}
-// 		h.ServeHTTP(w, r)
-// 	})
-// }
+func cors(ctx *fasthttp.RequestCtx) {
+	if cfg.Web.CORS {
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", cfg.Web.CORS_URL)
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", cfg.Web.CORS_URL)
+		ctx.Response.Header.Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
+		ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
+		ctx.Response.Header.Set(
+			"Access-Control-Allow-Headers",
+			"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
+		)
+		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
+	}
+}
 
 // func getProxy(w http.ResponseWriter, r *http.Request) {
 // 	type context struct {
