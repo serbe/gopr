@@ -6,22 +6,29 @@ import (
 
 func initServer() {
 	m := func(ctx *fasthttp.RequestCtx) {
-		switch string(ctx.Path()) {
-		case "/check":
-			if ctx.IsGet() {
-				checkHandler(ctx)
-			} else {
-				ctx.Error("not found", fasthttp.StatusNotFound)
-			}
-		case "/login":
-			if ctx.IsPost() {
+		if ctx.IsPost() {
+			switch string(ctx.Path()) {
+			case "/login":
 				login(ctx)
-			} else {
+			// case "/api/proxies/all":
+			// 	listProxies(ctx)
+			// case "/api/proxies/work":
+			// 	listWorkProxies(ctx)
+			// case "/api/proxies/anon":
+			// 	listAnonProxies(ctx)
+			// case "/api/proxies/counts":
+			// 	getCounts(ctx)
+			default:
 				ctx.Error("not found", fasthttp.StatusNotFound)
 			}
-		// case "/baz":
-		// 	bazHandler.HandlerFunc(ctx)
-		default:
+		} else if ctx.IsGet() {
+			switch string(ctx.Path()) {
+			case "/check":
+				checkHandler(ctx)
+			default:
+				ctx.Error("not found", fasthttp.StatusNotFound)
+			}
+		} else {
 			ctx.Error("not found", fasthttp.StatusNotFound)
 		}
 	}

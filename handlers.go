@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"github.com/serbe/adb"
 	"github.com/valyala/fasthttp"
 )
 
@@ -37,6 +39,50 @@ func checkHandler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
+func listProxies(ctx *fasthttp.RequestCtx) {
+	type context struct {
+		Title   string      `json:"title"`
+		Proxies []adb.Proxy `json:"proxies"`
+	}
+	proxies, _ := db.ProxyGetAll()
+	err := json.NewEncoder(ctx).Encode(context{Title: "List all proxies", Proxies: proxies})
+	errChkMsg("listProxies Encode", err)
+}
+
+func listWorkProxies(ctx *fasthttp.RequestCtx) {
+	type context struct {
+		Title   string      `json:"title"`
+		Proxies []adb.Proxy `json:"proxies"`
+	}
+	proxies, _ := db.ProxyGetAllWorking()
+	err := json.NewEncoder(ctx).Encode(context{Title: "List working proxies", Proxies: proxies})
+	errChkMsg("listWorkProxies Encode", err)
+}
+
+func listAnonProxies(ctx *fasthttp.RequestCtx) {
+	type context struct {
+		Title   string      `json:"title"`
+		Proxies []adb.Proxy `json:"proxies"`
+	}
+	proxies, _ := db.ProxyGetAllAnonymous()
+	err := json.NewEncoder(ctx).Encode(context{Title: "List anonymous proxies", Proxies: proxies})
+	errChkMsg("listWorkProxies Encode", err)
+}
+
+func getCounts(ctx *fasthttp.RequestCtx) {
+	type context struct {
+		Title string `json:"title"`
+		All   int64  `json:"all"`
+		Work  int64  `json:"work"`
+		Anon  int64  `json:"anon"`
+	}
+	all := db.ProxyGetAllCount()
+	work := db.ProxyGetAllWorkCount()
+	anon := db.ProxyGetAllAnonymousCount()
+	err := json.NewEncoder(ctx).Encode(context{Title: "Proxies counts", All: all, Work: work, Anon: anon})
+	errChkMsg("getCounts Encode", err)
+}
+
 // func corsHandler(h http.Handler) http.Handler {
 // 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 // 		w.Header().Set("Access-Control-Allow-Origin", cfg.Web.CORS_URL)
@@ -55,19 +101,6 @@ func checkHandler(ctx *fasthttp.RequestCtx) {
 // 	})
 // }
 
-// func checkHandler(w http.ResponseWriter, r *http.Request) {
-// 	_, err := fmt.Fprintf(w, "<p>RemoteAddr: %s</p>", r.RemoteAddr)
-// 	errChkMsg("checkHandler fmt.Fprintf", err)
-// 	for _, header := range headers {
-// 		str := r.Header.Get(header)
-// 		if str == "" {
-// 			continue
-// 		}
-// 		_, err = fmt.Fprintf(w, "<p>%s: %s</p>", header, str)
-// 		errChkMsg("checkHandler fmt.Fprintf", err)
-// 	}
-// }
-
 // func getProxy(w http.ResponseWriter, r *http.Request) {
 // 	type context struct {
 // 		Title string    `json:"title"`
@@ -76,48 +109,5 @@ func checkHandler(ctx *fasthttp.RequestCtx) {
 // 	id := toInt(chi.URLParam(r, "id"))
 // 	proxy, _ := db.ProxyGetByID(id)
 // 	ctx := context{Title: "Proxy", Proxy: proxy}
-// 	render.DefaultResponder(w, r, ctx)
-// }
-
-// func listProxies(w http.ResponseWriter, r *http.Request) {
-// 	type context struct {
-// 		Title   string      `json:"title"`
-// 		Proxies []adb.Proxy `json:"proxies"`
-// 	}
-// 	proxies, _ := db.ProxyGetAll()
-// 	ctx := context{Title: "List all proxies", Proxies: proxies}
-// 	render.DefaultResponder(w, r, ctx)
-// }
-
-// func listWorkProxies(w http.ResponseWriter, r *http.Request) {
-// 	type context struct {
-// 		Title   string      `json:"title"`
-// 		Proxies []adb.Proxy `json:"proxies"`
-// 	}
-// 	proxies, _ := db.ProxyGetAllWorking()
-// 	ctx := context{Title: "List working proxies", Proxies: proxies}
-// 	render.DefaultResponder(w, r, ctx)
-// }
-// func listAnonProxies(w http.ResponseWriter, r *http.Request) {
-// 	type context struct {
-// 		Title   string      `json:"title"`
-// 		Proxies []adb.Proxy `json:"proxies"`
-// 	}
-// 	proxies, _ := db.ProxyGetAllAnonymous()
-// 	ctx := context{Title: "List anonymous proxies", Proxies: proxies}
-// 	render.DefaultResponder(w, r, ctx)
-// }
-
-// func getCounts(w http.ResponseWriter, r *http.Request) {
-// 	type context struct {
-// 		Title string `json:"title"`
-// 		All   int64  `json:"all"`
-// 		Work  int64  `json:"work"`
-// 		Anon  int64  `json:"anon"`
-// 	}
-// 	all := db.ProxyGetAllCount()
-// 	work := db.ProxyGetAllWorkCount()
-// 	anon := db.ProxyGetAllAnonymousCount()
-// 	ctx := context{Title: "Proxies counts", All: all, Work: work, Anon: anon}
 // 	render.DefaultResponder(w, r, ctx)
 // }
