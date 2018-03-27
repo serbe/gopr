@@ -89,8 +89,7 @@ func getCounts(ctx *fasthttp.RequestCtx) {
 
 func cors(ctx *fasthttp.RequestCtx) {
 	if cfg.Web.CORS {
-		ctx.Response.Header.Set("Access-Control-Allow-Origin", cfg.Web.CORS_URL)
-		ctx.Response.Header.Set("Access-Control-Allow-Origin", cfg.Web.CORS_URL)
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", cfg.Web.CorsURL)
 		ctx.Response.Header.Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
 		ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
 		ctx.Response.Header.Set(

@@ -25,9 +25,9 @@ type Config struct {
 	Web struct {
 		Auth bool `json:"auth"`
 		// Log      bool   `json:"log"`
-		CORS     bool   `json:"cors"`
-		CORS_URL string `json:"cors_url"`
-		Port     string `json:"port"`
+		CORS    bool   `json:"cors"`
+		CorsURL string `json:"cors_url"`
+		Port    string `json:"port"`
 	} `json:"web"`
 	Base struct {
 		// LogSQL   bool   `json:"logsql"`
@@ -53,7 +53,7 @@ func getConfig() {
 	}
 	logErrors = cfg.Base.LogErr
 	if cfg.Base.Name == "" {
-		err = errors.New("Error: empty database name in config")
+		err = errors.New("empty database name in config")
 		log.Fatal("getConfig", err)
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	jwtGo "github.com/dgrijalva/jwt-go"
 	"github.com/valyala/fasthttp"
 )
 
@@ -31,12 +31,12 @@ func login(ctx *fasthttp.RequestCtx) {
 	}
 
 	if data.Username == "user" && data.Password == "userpass" {
-		claims := jwt.StandardClaims{
+		claims := jwtGo.StandardClaims{
 			ExpiresAt: 15000,
 			Issuer:    "test",
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		token := jwtGo.NewWithClaims(jwtGo.SigningMethodHS256, claims)
 		ss, err := token.SignedString(sKey)
 		if err != nil {
 			errmsg("login SignedString", err)
@@ -62,14 +62,14 @@ func login(ctx *fasthttp.RequestCtx) {
 
 func checkAuth(ctx *fasthttp.RequestCtx) bool {
 	if cfg.Web.Auth {
-		parser := &jwt.Parser{
+		parser := &jwtGo.Parser{
 			ValidMethods: []string{"HS256"},
 		}
 		bearer := parseBearerAuth(string(ctx.Request.Header.Peek("Authorization")))
 		if bearer == "" {
 			return false
 		}
-		token, err := parser.Parse(bearer, func(t *jwt.Token) (interface{}, error) {
+		token, err := parser.Parse(bearer, func(t *jwtGo.Token) (interface{}, error) {
 			return sKey, nil
 		})
 		errChkMsg("checkAuth Parse", err)
