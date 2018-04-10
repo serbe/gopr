@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/valyala/fasthttp"
 )
 
@@ -15,6 +17,8 @@ func initServer() {
 			}
 		} else if ctx.IsGet() {
 			switch string(ctx.Path()) {
+			case "/loaderio-a756090c2ec9b33ba21d957b28485477.txt":
+				fmt.Fprintf(ctx, "loaderio-a756090c2ec9b33ba21d957b28485477")
 			case "/check":
 				checkHandler(ctx)
 			case "/api/proxies/all":
