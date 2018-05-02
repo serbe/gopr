@@ -54,5 +54,15 @@ func startBot() {
 		b.Send(m.Sender, result)
 	})
 
+	b.Handle("/countwork", func(m *tb.Message) {
+		result := strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
+		b.Send(m.Sender, result)
+	})
+
+	b.Handle("/countanon", func(m *tb.Message) {
+		result := strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
+		b.Send(m.Sender, result)
+	})
+
 	b.Start()
 }
