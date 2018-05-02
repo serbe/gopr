@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
+	"net/http"
 
 	jwtGo "github.com/dgrijalva/jwt-go"
-	"github.com/valyala/fasthttp"
 )
 
 var sKey = []byte("aH0tH3P5up3RdYP3r53crEt")
@@ -21,12 +20,12 @@ type jsonData struct {
 	Token string `json:"token"`
 }
 
-func login(ctx *fasthttp.RequestCtx) {
+func login(w http.ResponseWriter, req *http.Request) {
 	var data loginData
-	err := json.NewDecoder(bytes.NewReader(ctx.PostBody())).Decode(&data)
+	err := json.NewDecoder(req.Body).Decode(&data)
 	if err != nil {
 		errmsg("login Decode", err)
-		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -40,32 +39,32 @@ func login(ctx *fasthttp.RequestCtx) {
 		ss, err := token.SignedString(sKey)
 		if err != nil {
 			errmsg("login SignedString", err)
-			ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		ctx.Response.Header.SetCanonical(strContentType, strApplicationJSON)
+		w.Header().Set("Content-Type", "application/json")
 		data := jsonData{
 			Token: ss,
 			Name:  data.Username,
 			Admin: false,
 		}
-		err = json.NewEncoder(ctx).Encode(data)
+		err = json.NewEncoder(w).Encode(data)
 		if err != nil {
 			errmsg("login Encode", err)
-			ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	} else {
-		ctx.Error("Invalid Username or Password", fasthttp.StatusNotFound)
+		http.Error(w, "Invalid Username or Password", http.StatusNotFound)
 	}
 }
 
-func checkAuth(ctx *fasthttp.RequestCtx) bool {
+func checkAuth(w http.ResponseWriter, req *http.Request) bool {
 	if cfg.Web.Auth {
 		parser := &jwtGo.Parser{
 			ValidMethods: []string{"HS256"},
 		}
-		bearer := parseBearerAuth(string(ctx.Request.Header.Peek("Authorization")))
+		bearer := parseBearerAuth(string(req.Header.Get("Authorization")))
 		if bearer == "" {
 			return false
 		}

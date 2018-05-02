@@ -1,59 +1,58 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/valyala/fasthttp"
+	"net/http"
 )
 
 func initServer() {
-	m := func(ctx *fasthttp.RequestCtx) {
-		if ctx.IsPost() {
-			switch string(ctx.Path()) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodPost {
+			switch req.URL.Path {
 			case "/login":
-				login(ctx)
+				login(w, req)
 			default:
-				ctx.Error("not found", fasthttp.StatusNotFound)
+				http.Error(w, "not found", http.StatusNotFound)
 			}
-		} else if ctx.IsGet() {
-			switch string(ctx.Path()) {
-			case "/loaderio-a756090c2ec9b33ba21d957b28485477.txt":
-				fmt.Fprintf(ctx, "loaderio-a756090c2ec9b33ba21d957b28485477")
+		} else if req.Method == http.MethodGet {
+			switch req.URL.Path {
+			// case "/loaderio-a756090c2ec9b33ba21d957b28485477.txt":
+			// 	fmt.Fprintf(ctx, "loaderio-a756090c2ec9b33ba21d957b28485477")
 			case "/check":
-				checkHandler(ctx)
+				checkHandler(w, req)
 			case "/api/proxies/all":
-				if checkAuth(ctx) {
-					listProxies(ctx)
+				if checkAuth(w, req) {
+					listProxies(w, req)
 				} else {
-					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+					http.Error(w, "Not Authorized", http.StatusUnauthorized)
 				}
 			case "/api/proxies/work":
-				if checkAuth(ctx) {
-					listWorkProxies(ctx)
+				if checkAuth(w, req) {
+					listWorkProxies(w, req)
 				} else {
-					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+					http.Error(w, "Not Authorized", http.StatusUnauthorized)
 				}
 			case "/api/proxies/anon":
-				if checkAuth(ctx) {
-					listAnonProxies(ctx)
+				if checkAuth(w, req) {
+					listAnonProxies(w, req)
 				} else {
-					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+					http.Error(w, "Not Authorized", http.StatusUnauthorized)
 				}
 			case "/api/proxies/counts":
-				if checkAuth(ctx) {
-					getCounts(ctx)
+				if checkAuth(w, req) {
+					getCounts(w, req)
 				} else {
-					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
+					http.Error(w, "Not Authorized", http.StatusUnauthorized)
 				}
 			default:
-				ctx.Error("not found", fasthttp.StatusNotFound)
+				http.Error(w, "not found", http.StatusNotFound)
 			}
 		} else {
-			ctx.Error("not found", fasthttp.StatusNotFound)
+			http.Error(w, "not found", http.StatusNotFound)
 		}
-	}
+	})
 
-	err := fasthttp.ListenAndServe(":"+cfg.Web.Port, m)
+	err := http.ListenAndServe(":"+cfg.Web.Port, mux)
 	errChkMsg("ListenAndServe", err)
 }
 
