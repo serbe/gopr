@@ -7,14 +7,15 @@ import (
 func initServer() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if req.Method == http.MethodPost {
+		switch req.Method {
+		case http.MethodPost:
 			switch req.URL.Path {
 			case "/login":
 				login(w, req)
 			default:
 				http.Error(w, "not found", http.StatusNotFound)
 			}
-		} else if req.Method == http.MethodGet {
+		case http.MethodGet:
 			switch req.URL.Path {
 			// case "/loaderio-a756090c2ec9b33ba21d957b28485477.txt":
 			// 	fmt.Fprintf(ctx, "loaderio-a756090c2ec9b33ba21d957b28485477")
@@ -47,7 +48,7 @@ func initServer() {
 			default:
 				http.Error(w, "not found", http.StatusNotFound)
 			}
-		} else {
+		default:
 			http.Error(w, "not found", http.StatusNotFound)
 		}
 	})
