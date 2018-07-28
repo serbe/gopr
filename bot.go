@@ -48,6 +48,14 @@ func startBot() {
 			result = strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
 		case "anon":
 			result = strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
+		case "http":
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("http"), 10)
+		case "https":
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("https"), 10)
+		case "socks":
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("socks"), 10)
+		case "old":
+			result = strconv.FormatInt(db.ProxyGetAllOldCount(), 10)
 		default:
 			result = "Use work, anon or empty string"
 		}
