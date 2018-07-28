@@ -53,7 +53,7 @@ func startBot() {
 		case "https":
 			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("https"), 10)
 		case "socks":
-			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("socks"), 10)
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("socks5"), 10)
 		case "old":
 			result = strconv.FormatInt(db.ProxyGetAllOldCount(), 10)
 		default:
