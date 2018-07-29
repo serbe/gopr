@@ -39,7 +39,6 @@ func startBot() {
 
 	b.Handle("/count", func(m *tb.Message) {
 		arg := getArgString(m.Text)
-		log.Println(arg, m.Text)
 		var result string
 		switch arg {
 		case "":
@@ -57,18 +56,44 @@ func startBot() {
 		case "old":
 			result = strconv.FormatInt(db.ProxyGetAllOldCount(), 10)
 		default:
-			result = "Use work, anon or empty string"
+			result = "Use work, anon, http, https, socks5, old or empty string"
 		}
 		b.Send(m.Sender, result)
 	})
 
 	b.Handle("/countwork", func(m *tb.Message) {
-		result := strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
+		arg := getArgString(m.Text)
+		var result string
+		switch arg {
+		case "":
+			result = strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
+		case "http":
+			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount("http"), 10)
+		case "https":
+			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount("https"), 10)
+		case "socks":
+			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount("socks5"), 10)
+		default:
+			result = "Use http, https, socks5 or empty string"
+		}
 		b.Send(m.Sender, result)
 	})
 
 	b.Handle("/countanon", func(m *tb.Message) {
-		result := strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
+		arg := getArgString(m.Text)
+		var result string
+		switch arg {
+		case "":
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
+		case "http":
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount("http"), 10)
+		case "https":
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount("https"), 10)
+		case "socks":
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount("socks5"), 10)
+		default:
+			result = "Use http, https, socks5 or empty string"
+		}
 		b.Send(m.Sender, result)
 	})
 
