@@ -9,6 +9,14 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
+const cAnon = "anon"
+const cHTTP = "http"
+const cHTTPS = "https"
+const cSocks = "socks"
+const cSocks5 = "socks5"
+const cOld = "old"
+const cWork = "work"
+
 func startBot() {
 	b, err := tb.NewBot(tb.Settings{
 		Token:  cfg.Bot.Token,
@@ -43,17 +51,17 @@ func startBot() {
 		switch arg {
 		case "":
 			result = strconv.FormatInt(db.ProxyGetAllCount(), 10)
-		case "work":
+		case cWork:
 			result = strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
-		case "anon":
+		case cAnon:
 			result = strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
-		case "http":
-			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("http"), 10)
-		case "https":
-			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("https"), 10)
-		case "socks":
-			result = strconv.FormatInt(db.ProxyGetAllSchemeCount("socks5"), 10)
-		case "old":
+		case cHTTP:
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount(cHTTP), 10)
+		case cHTTPS:
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount(cHTTPS), 10)
+		case cSocks:
+			result = strconv.FormatInt(db.ProxyGetAllSchemeCount(cSocks5), 10)
+		case cOld:
 			result = strconv.FormatInt(db.ProxyGetAllOldCount(), 10)
 		default:
 			result = "Use work, anon, http, https, socks5, old or empty string"
@@ -67,12 +75,12 @@ func startBot() {
 		switch arg {
 		case "":
 			result = strconv.FormatInt(db.ProxyGetAllWorkCount(), 10)
-		case "http":
-			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount("http"), 10)
-		case "https":
-			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount("https"), 10)
-		case "socks":
-			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount("socks5"), 10)
+		case cHTTP:
+			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount(cHTTP), 10)
+		case cHTTPS:
+			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount(cHTTPS), 10)
+		case cSocks:
+			result = strconv.FormatInt(db.ProxyGetAllWorkingSchemeCount(cSocks5), 10)
 		default:
 			result = "Use http, https, socks5 or empty string"
 		}
@@ -85,12 +93,12 @@ func startBot() {
 		switch arg {
 		case "":
 			result = strconv.FormatInt(db.ProxyGetAllAnonymousCount(), 10)
-		case "http":
-			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount("http"), 10)
-		case "https":
-			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount("https"), 10)
-		case "socks":
-			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount("socks5"), 10)
+		case cHTTP:
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount(cHTTP), 10)
+		case cHTTPS:
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount(cHTTPS), 10)
+		case cSocks:
+			result = strconv.FormatInt(db.ProxyGetAllAnonymousSchemeCount(cSocks5), 10)
 		default:
 			result = "Use http, https, socks5 or empty string"
 		}

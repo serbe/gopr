@@ -64,7 +64,7 @@ func checkAuth(w http.ResponseWriter, req *http.Request) bool {
 		parser := &jwtGo.Parser{
 			ValidMethods: []string{"HS256"},
 		}
-		bearer := parseBearerAuth(string(req.Header.Get("Authorization")))
+		bearer := parseBearerAuth(req.Header.Get("Authorization"))
 		if bearer == "" {
 			return false
 		}
