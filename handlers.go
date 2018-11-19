@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/serbe/adb"
+	"github.com/valyala/fasthttp"
 )
 
 var headers = []string{
@@ -26,77 +26,77 @@ var headers = []string{
 	"HTTP_PROXY_CONNECTION",
 }
 
-func checkHandler(w http.ResponseWriter, req *http.Request) {
-	_, err := fmt.Fprintf(w, "<p>RemoteAddr: %s</p>", req.RemoteAddr)
+func checkHandler(ctx *fasthttp.RequestCtx) {
+	_, err := fmt.Fprintf(ctx, "<p>RemoteAddr: %s</p>", ctx.RemoteAddr())
 	errChkMsg("checkHandler fmt.Fprintf", err)
 	for _, header := range headers {
-		str := req.Header.Get(header)
-		if str == "" {
+		b := ctx.Request.Header.Peek(header)
+		if b == nil {
 			continue
 		}
-		_, err = fmt.Fprintf(w, "<p>%s: %s</p>", header, str)
+		_, err = fmt.Fprintf(ctx, "<p>%s: %s</p>", header, string(b))
 		errChkMsg("checkHandler fmt.Fprintf", err)
 	}
 }
 
-func listProxies(w http.ResponseWriter, req *http.Request) {
+func listProxies(ctx *fasthttp.RequestCtx) {
 	type context struct {
 		Title   string      `json:"title"`
 		Proxies []adb.Proxy `json:"proxies"`
 	}
-	cors(w, req)
+	cors(ctx)
 	proxies, _ := db.ProxyGetAll()
-	err := json.NewEncoder(w).Encode(context{Title: "List all proxies", Proxies: proxies})
+	err := json.NewEncoder(ctx).Encode(context{Title: "List all proxies", Proxies: proxies})
 	errChkMsg("listProxies Encode", err)
 }
 
-func listWorkProxies(w http.ResponseWriter, req *http.Request) {
+func listWorkProxies(ctx *fasthttp.RequestCtx) {
 	type context struct {
 		Title   string      `json:"title"`
 		Proxies []adb.Proxy `json:"proxies"`
 	}
-	cors(w, req)
+	cors(ctx)
 	proxies, _ := db.ProxyGetAllWorking()
-	err := json.NewEncoder(w).Encode(context{Title: "List working proxies", Proxies: proxies})
+	err := json.NewEncoder(ctx).Encode(context{Title: "List working proxies", Proxies: proxies})
 	errChkMsg("listWorkProxies Encode", err)
 }
 
-func listAnonProxies(w http.ResponseWriter, req *http.Request) {
+func listAnonProxies(ctx *fasthttp.RequestCtx) {
 	type context struct {
 		Title   string      `json:"title"`
 		Proxies []adb.Proxy `json:"proxies"`
 	}
-	cors(w, req)
+	cors(ctx)
 	proxies, _ := db.ProxyGetAllAnonymous()
-	err := json.NewEncoder(w).Encode(context{Title: "List anonymous proxies", Proxies: proxies})
+	err := json.NewEncoder(ctx).Encode(context{Title: "List anonymous proxies", Proxies: proxies})
 	errChkMsg("listWorkProxies Encode", err)
 }
 
-func getCounts(w http.ResponseWriter, req *http.Request) {
+func getCounts(ctx *fasthttp.RequestCtx) {
 	type context struct {
 		Title string `json:"title"`
 		All   int64  `json:"all"`
 		Work  int64  `json:"work"`
 		Anon  int64  `json:"anon"`
 	}
-	cors(w, req)
+	cors(ctx)
 	all := db.ProxyGetAllCount()
 	work := db.ProxyGetAllWorkCount()
 	anon := db.ProxyGetAllAnonymousCount()
-	err := json.NewEncoder(w).Encode(context{Title: "Proxies counts", All: all, Work: work, Anon: anon})
+	err := json.NewEncoder(ctx).Encode(context{Title: "Proxies counts", All: all, Work: work, Anon: anon})
 	errChkMsg("getCounts Encode", err)
 }
 
-func cors(w http.ResponseWriter, req *http.Request) {
+func cors(ctx *fasthttp.RequestCtx) {
 	if cfg.Web.CORS {
-		w.Header().Set("Access-Control-Allow-Origin", cfg.Web.CorsURL)
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
-		w.Header().Set("Access-Control-Max-Age", "3600")
-		w.Header().Set(
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", cfg.Web.CorsURL)
+		ctx.Response.Header.Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
+		ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
+		ctx.Response.Header.Set(
 			"Access-Control-Allow-Headers",
 			"Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
 		)
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 	}
 }
 

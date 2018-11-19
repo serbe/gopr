@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
-	"net/http"
 
 	jwtGo "github.com/dgrijalva/jwt-go"
+
+	"github.com/valyala/fasthttp"
 )
 
 var sKey = []byte("aH0tH3P5up3RdYP3r53crEt")
@@ -20,12 +22,13 @@ type jsonData struct {
 	Token string `json:"token"`
 }
 
-func login(w http.ResponseWriter, req *http.Request) {
+func login(ctx *fasthttp.RequestCtx) {
 	var data loginData
-	err := json.NewDecoder(req.Body).Decode(&data)
+	buf := bytes.NewReader(ctx.PostBody())
+	err := json.NewDecoder(buf).Decode(&data)
 	if err != nil {
 		errmsg("login Decode", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		return
 	}
 
@@ -39,32 +42,32 @@ func login(w http.ResponseWriter, req *http.Request) {
 		ss, err := token.SignedString(sKey)
 		if err != nil {
 			errmsg("login SignedString", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
+		ctx.Response.Header.Set("Content-Type", "application/json")
 		data := jsonData{
 			Token: ss,
 			Name:  data.Username,
 			Admin: false,
 		}
-		err = json.NewEncoder(w).Encode(data)
+		err = json.NewEncoder(ctx).Encode(data)
 		if err != nil {
 			errmsg("login Encode", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			ctx.Error(err.Error(), fasthttp.StatusInternalServerError)
 		}
 	} else {
-		http.Error(w, "Invalid Username or Password", http.StatusNotFound)
+		ctx.Error("Invalid Username or Password", fasthttp.StatusNotFound)
 	}
 }
 
-func checkAuth(w http.ResponseWriter, req *http.Request) bool {
+func checkAuth(ctx *fasthttp.RequestCtx) bool {
 	if cfg.Web.Auth {
 		parser := &jwtGo.Parser{
 			ValidMethods: []string{"HS256"},
 		}
-		bearer := parseBearerAuth(req.Header.Get("Authorization"))
+		bearer := parseBearerAuth(string(ctx.Request.Header.Peek("Authorization")))
 		if bearer == "" {
 			return false
 		}

@@ -1,58 +1,56 @@
 package main
 
 import (
-	"net/http"
+	"github.com/valyala/fasthttp"
 )
 
 func initServer() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		switch req.Method {
-		case http.MethodPost:
-			switch req.URL.Path {
-			case "/login":
-				login(w, req)
-			default:
-				http.Error(w, "not found", http.StatusNotFound)
-			}
-		case http.MethodGet:
-			switch req.URL.Path {
+	mux := func(ctx *fasthttp.RequestCtx) {
+		if ctx.IsGet() {
+			switch string(ctx.Path()) {
 			// case "/loaderio-a756090c2ec9b33ba21d957b28485477.txt":
 			// 	fmt.Fprintf(ctx, "loaderio-a756090c2ec9b33ba21d957b28485477")
 			case "/check":
-				checkHandler(w, req)
+				checkHandler(ctx)
 			case "/api/proxies/all":
-				if checkAuth(w, req) {
-					listProxies(w, req)
+				if checkAuth(ctx) {
+					listProxies(ctx)
 				} else {
-					http.Error(w, "Not Authorized", http.StatusUnauthorized)
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
 			case "/api/proxies/work":
-				if checkAuth(w, req) {
-					listWorkProxies(w, req)
+				if checkAuth(ctx) {
+					listWorkProxies(ctx)
 				} else {
-					http.Error(w, "Not Authorized", http.StatusUnauthorized)
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
 			case "/api/proxies/anon":
-				if checkAuth(w, req) {
-					listAnonProxies(w, req)
+				if checkAuth(ctx) {
+					listAnonProxies(ctx)
 				} else {
-					http.Error(w, "Not Authorized", http.StatusUnauthorized)
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
 			case "/api/proxies/counts":
-				if checkAuth(w, req) {
-					getCounts(w, req)
+				if checkAuth(ctx) {
+					getCounts(ctx)
 				} else {
-					http.Error(w, "Not Authorized", http.StatusUnauthorized)
+					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
 			default:
-				http.Error(w, "not found", http.StatusNotFound)
+				ctx.Error("not found", fasthttp.StatusNotFound)
 			}
-		default:
-			http.Error(w, "not found", http.StatusNotFound)
+		} else if ctx.IsPost() {
+			switch string(ctx.Path()) {
+			case "/login":
+				login(ctx)
+			default:
+				ctx.Error("not found", fasthttp.StatusNotFound)
+			}
+		} else {
+			ctx.Error("not found", fasthttp.StatusNotFound)
 		}
-	})
+	}
 
-	err := http.ListenAndServe(":"+cfg.Web.Port, mux)
+	err := fasthttp.ListenAndServe(":"+cfg.Web.Port, mux)
 	errChkMsg("ListenAndServe", err)
 }
