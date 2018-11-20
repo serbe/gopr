@@ -1,36 +1,48 @@
 package main
 
 import (
+	"bytes"
+
 	"github.com/valyala/fasthttp"
+)
+
+var (
+	strPOST            = []byte("POST")
+	strGET             = []byte("GET")
+	pathCheck          = []byte("/check")
+	pathLogin          = []byte("/login")
+	pathAPIAllProxy    = []byte("/api/proxies/all")
+	pathAPIWorkProxy   = []byte("/api/proxies/work")
+	pathAPIAnonProxy   = []byte("/api/proxies/anon")
+	pathAPICountsProxy = []byte("/api/proxies/counts")
 )
 
 func initServer() {
 	mux := func(ctx *fasthttp.RequestCtx) {
-		if ctx.IsGet() {
-			switch string(ctx.Path()) {
-			// case "/loaderio-a756090c2ec9b33ba21d957b28485477.txt":
-			// 	fmt.Fprintf(ctx, "loaderio-a756090c2ec9b33ba21d957b28485477")
-			case "/check":
+		switch {
+		case bytes.Equal(ctx.Method(), strGET):
+			switch {
+			case bytes.Equal(ctx.Path(), pathCheck):
 				checkHandler(ctx)
-			case "/api/proxies/all":
+			case bytes.Equal(ctx.Path(), pathAPIAllProxy):
 				if checkAuth(ctx) {
 					listProxies(ctx)
 				} else {
 					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
-			case "/api/proxies/work":
+			case bytes.Equal(ctx.Path(), pathAPIWorkProxy):
 				if checkAuth(ctx) {
 					listWorkProxies(ctx)
 				} else {
 					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
-			case "/api/proxies/anon":
+			case bytes.Equal(ctx.Path(), pathAPIAnonProxy):
 				if checkAuth(ctx) {
 					listAnonProxies(ctx)
 				} else {
 					ctx.Error("Not Authorized", fasthttp.StatusUnauthorized)
 				}
-			case "/api/proxies/counts":
+			case bytes.Equal(ctx.Path(), pathAPICountsProxy):
 				if checkAuth(ctx) {
 					getCounts(ctx)
 				} else {
@@ -39,14 +51,14 @@ func initServer() {
 			default:
 				ctx.Error("not found", fasthttp.StatusNotFound)
 			}
-		} else if ctx.IsPost() {
-			switch string(ctx.Path()) {
-			case "/login":
+		case bytes.Equal(ctx.Method(), strPOST):
+			switch {
+			case bytes.Equal(ctx.Path(), pathLogin):
 				login(ctx)
 			default:
 				ctx.Error("not found", fasthttp.StatusNotFound)
 			}
-		} else {
+		default:
 			ctx.Error("not found", fasthttp.StatusNotFound)
 		}
 	}

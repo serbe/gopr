@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/serbe/adb"
 	"github.com/valyala/fasthttp"
@@ -27,15 +26,16 @@ var headers = []string{
 }
 
 func checkHandler(ctx *fasthttp.RequestCtx) {
-	_, err := fmt.Fprintf(ctx, "<p>RemoteAddr: %s</p>", ctx.RemoteAddr())
-	errChkMsg("checkHandler fmt.Fprintf", err)
+	ctx.Response.SetStatusCode(200)
+	ctx.WriteString("<p>RemoteAddr: " + ctx.RemoteAddr().String() + "</p>")
 	for _, header := range headers {
 		b := ctx.Request.Header.Peek(header)
 		if b == nil {
 			continue
 		}
-		_, err = fmt.Fprintf(ctx, "<p>%s: %s</p>", header, string(b))
-		errChkMsg("checkHandler fmt.Fprintf", err)
+		ctx.WriteString("<p>" + header + ": ")
+		ctx.Write(b)
+		ctx.WriteString("</p>")
 	}
 }
 
