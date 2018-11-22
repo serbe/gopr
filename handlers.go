@@ -36,6 +36,7 @@ func checkHandler(ctx *fasthttp.RequestCtx) {
 		ctx.WriteString("<p>" + header + ": ")
 		ctx.Write(b)
 		ctx.WriteString("</p>")
+		ctx.SetConnectionClose()
 	}
 }
 
