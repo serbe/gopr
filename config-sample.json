@@ -9,13 +9,6 @@
   },
   "web": {
     "port": "8080",
-    "log": true,
-    "auth": true,
-    "cors": true,
-    "cors_url": "http://127.0.0.1:8080"
-  },
-  "bot": {
-    "enable": true,
-    "token": "bottoken"
+    "log": true
   }
 }

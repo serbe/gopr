@@ -10,8 +10,5 @@ func main() {
 		cfg.Base.User,
 		cfg.Base.Password,
 	)
-	if cfg.Bot.Enable {
-		go startBot()
-	}
 	initServer()
 }
