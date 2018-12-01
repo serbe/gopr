@@ -20,6 +20,6 @@ func initServer() {
 		}
 	})
 
-	err := http.ListenAndServe(":"+cfg.Web.Port, mux)
+	err := http.ListenAndServe(":"+cfg.Port, mux)
 	errChkMsg("ListenAndServe", err)
 }

@@ -1,14 +1,4 @@
 {
-  "base": {
-    "user": "Pquser",
-    "password": "Pqpassword",
-    "name": "Pqdbname",
-    "host": "127.0.0.1:5432",
-    "logsql": false,
-    "logerr": false
-  },
-  "web": {
-    "port": "8080",
-    "log": true
-  }
+  "port": "8080",
+  "log": true
 }
